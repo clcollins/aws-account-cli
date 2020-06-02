@@ -5,8 +5,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	cmdutil "k8s.io/kubectl/pkg/cmd/util"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -16,13 +17,10 @@ func init() {
 }
 
 func NewCmdRoot(streams genericclioptions.IOStreams) *cobra.Command {
-	// defaultClusterName := os.Getenv("CLUSTER_NAME")
-	// cmd.PersistentFlags().StringVarP(&rootCommand.clusterName, "name", "", defaultClusterName, "Name of cluster. Overrides KOPS_CLUSTER_NAME environment variable")
-
 	rootCmd := &cobra.Command{
 		Use:   "aws-account-cli",
-		Short: "",
-		Long:  ``,
+		Short: "AWS account cli",
+		Long:  `AWS account command line utilities`,
 		Run:   help,
 	}
 
@@ -32,10 +30,12 @@ func NewCmdRoot(streams genericclioptions.IOStreams) *cobra.Command {
 	kubeFlags := genericclioptions.NewConfigFlags(false)
 	kubeFlags.AddFlags(rootCmd.PersistentFlags())
 
-	f := cmdutil.NewFactory(kubeFlags)
+	// add sub commands
+	rootCmd.AddCommand(newCmdReset(streams, kubeFlags))
 
-	// create subcommands
-	rootCmd.AddCommand(newCmdReset(f))
+	// add options command to list global flags
+	templates.ActsAsRootCommand(rootCmd, []string{"options"})
+	rootCmd.AddCommand(newCmdOptions(streams))
 
 	return rootCmd
 }
