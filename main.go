@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"k8s.io/component-base/logs"
 	"os"
 
 	"github.com/spf13/pflag"
@@ -10,7 +11,6 @@ import (
 	"github.com/yeya24/aws-account-cli/cmd"
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	"k8s.io/component-base/logs"
 )
 
 func main() {

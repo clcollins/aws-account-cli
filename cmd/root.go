@@ -10,12 +10,11 @@ import (
 	"k8s.io/kubectl/pkg/util/templates"
 )
 
-// rootCmd represents the base command when called without any subcommands
-
 func init() {
 	NewCmdRoot(genericclioptions.IOStreams{In: os.Stdin, Out: os.Stdout, ErrOut: os.Stderr})
 }
 
+// rootCmd represents the base command when called without any subcommands
 func NewCmdRoot(streams genericclioptions.IOStreams) *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "aws-account-cli",

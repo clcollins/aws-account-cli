@@ -18,13 +18,15 @@ import (
 
 const (
 	AWS_ACCOUNT_NAMESPACE = "aws-account-operator"
+	ResetUsage            = "The name of Account CR is required for reset command"
 )
 
+// newCmdReset implements the reset command which resets the specified account cr
 func newCmdReset(streams genericclioptions.IOStreams, flags *genericclioptions.ConfigFlags) *cobra.Command {
 	ops := newResetOptions(streams, flags)
 	resetCmd := &cobra.Command{
-		Use:                   "reset [flags] <account name>",
-		Short:                 "",
+		Use:                   "reset [flags] <account name> [options]",
+		Short:                 "reset AWS account",
 		Args:                  cobra.ExactArgs(1),
 		DisableFlagsInUseLine: true,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -33,14 +35,18 @@ func newCmdReset(streams genericclioptions.IOStreams, flags *genericclioptions.C
 		},
 	}
 
+	resetCmd.Flags().StringVar(&ops.accountNamespace, "account-namespace", AWS_ACCOUNT_NAMESPACE,
+		"The namespace to keep AWS accounts. The default value is aws-account-operator.")
+
 	return resetCmd
 }
 
-// resetCmd represents the export command
+// resetOptions defines the struct for running reset command
 type resetOptions struct {
-	accountName string
+	accountName      string
+	accountNamespace string
 
-	flags   *genericclioptions.ConfigFlags
+	flags *genericclioptions.ConfigFlags
 	genericclioptions.IOStreams
 	kubeCli client.Client
 
@@ -57,7 +63,7 @@ func newResetOptions(streams genericclioptions.IOStreams, flags *genericclioptio
 
 func (o *resetOptions) complete(cmd *cobra.Command, args []string) error {
 	if len(args) != 1 {
-		return cmdutil.UsageErrorf(cmd, "")
+		return cmdutil.UsageErrorf(cmd, ResetUsage)
 	}
 	o.accountName = args[0]
 
