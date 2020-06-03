@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	awsv1alpha1 "github.com/openshift/aws-account-operator/pkg/apis/aws/v1alpha1"
 	"github.com/spf13/cobra"
 
 	v1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
@@ -99,10 +101,12 @@ func (o *resetOptions) run() error {
 		return err
 	}
 	for _, secret := range secrets.Items {
-		if secret.OwnerReferences != nil &&
-			secret.OwnerReferences[0].Name == o.accountName {
+		if strings.HasPrefix(secret.Name, o.accountName) {
 			fmt.Println("Deleting secret", secret.Name)
 			if err := o.kubeCli.Delete(ctx, &secret, &client.DeleteOptions{}); err != nil {
+				if apierrors.IsNotFound(err) {
+					continue
+				}
 				return err
 			}
 		}
