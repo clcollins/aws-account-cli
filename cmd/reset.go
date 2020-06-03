@@ -85,7 +85,7 @@ func (o *resetOptions) complete(cmd *cobra.Command, args []string) error {
 
 func (o *resetOptions) run() error {
 	key := types.NamespacedName{
-		Namespace: AWS_ACCOUNT_NAMESPACE,
+		Namespace: o.accountNamespace,
 		Name:      o.accountName,
 	}
 
@@ -94,7 +94,7 @@ func (o *resetOptions) run() error {
 	//cleanup secrets
 	var secrets v1.SecretList
 	if err := o.kubeCli.List(ctx, &secrets, &client.ListOptions{
-		Namespace: AWS_ACCOUNT_NAMESPACE,
+		Namespace: o.accountNamespace,
 	}); err != nil {
 		return err
 	}
